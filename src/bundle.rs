@@ -1,5 +1,4 @@
-use std::default;
-use ethers::types::{BlockNumber, H256, U64};
+use ethers::types::{H256, U64};
 use serde::{de, Deserialize, Deserializer, Serialize};
 
 pub type BundleHash = H256;
@@ -31,15 +30,16 @@ pub struct SimulateBundleRequest {
 pub enum StateBlockNumber {
     Number(U64),
     #[default]
-    Latest
+    Latest,
 }
 
-impl <'de> Deserialize<'de> for StateBlockNumber {
+impl<'de> Deserialize<'de> for StateBlockNumber {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: Deserializer<'de>
+    where
+        D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        
+
         if s == "latest" {
             Ok(StateBlockNumber::Latest)
         } else {
@@ -88,7 +88,11 @@ impl SendBundleRequest {
 }
 
 impl SimulateBundleRequest {
-    pub fn new(txs: Vec<BundleHash>, block_number: U64, state_block_number: StateBlockNumber) -> Self {
+    pub fn new(
+        txs: Vec<BundleHash>,
+        block_number: U64,
+        state_block_number: StateBlockNumber,
+    ) -> Self {
         Self {
             txs,
             block_number,
@@ -101,11 +105,11 @@ impl SimulateBundleRequest {
         self.timestamp = Some(timestamp);
         self
     }
-    
+
     pub fn block(&self) -> U64 {
         self.block_number
     }
-    
+
     pub fn state_block_number(mut self, state_block_number: StateBlockNumber) -> Self {
         self.state_block_number = state_block_number;
         self

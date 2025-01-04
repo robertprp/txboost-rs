@@ -1,14 +1,7 @@
-use crate::{
-    bundle::BundleHash,
-    jsonrpc::{JsonRpcError, Request, Response},
-};
-use ethers::core::{
-    types::{H256, U64},
-    utils::keccak256,
-};
+use crate::jsonrpc::{JsonRpcError, Request, Response};
 use ethers::signers::Signer;
 use reqwest::{header::HeaderValue, Client, ClientBuilder, Error as ReqwestError};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Serialize};
 use std::sync::atomic::{AtomicU64, Ordering};
 use thiserror::Error;
 use url::Url;
@@ -37,24 +30,22 @@ pub enum RelayError {
     #[error("Failed to send request")]
     RequestError(#[from] ReqwestError),
     #[error("Error response: {text}")]
-    ResponseSerdeJson {
-        text: String,
-    },
+    ResponseSerdeJson { text: String },
 }
 
 impl<S: Signer> Relay<S> {
     /// Initializes a new relay client.
     pub fn new(url: impl Into<Url>, signer: Option<S>, authorization_key: String) -> Self {
         let client_builder = ClientBuilder::new();
-        
+
         let mut headers = reqwest::header::HeaderMap::new();
         headers.insert(
             reqwest::header::AUTHORIZATION,
             HeaderValue::from_str(&authorization_key).unwrap(),
         );
-        
+
         let client_builder = client_builder.default_headers(headers);
-        
+
         Self {
             id: AtomicU64::new(0),
             client: client_builder.build().unwrap(),
@@ -75,7 +66,7 @@ impl<S: Signer> Relay<S> {
 
         let payload = Request::new(next_id, method, params);
 
-        let mut req = self.client.post(self.url.as_ref());
+        let req = self.client.post(self.url.as_ref());
 
         let res = req.json(&payload).send().await?;
         let status = res.error_for_status_ref();
@@ -96,7 +87,7 @@ impl<S: Signer> Relay<S> {
                 let text = res.text().await?;
                 let res: Response<R> = serde_json::from_str(&text).unwrap();
                 let result: Result<Option<R>, JsonRpcError> = res.data.into_result();
-                
+
                 match result {
                     Ok(result) => Ok(result),
                     Err(err) => Err(RelayError::ResponseSerdeJson {

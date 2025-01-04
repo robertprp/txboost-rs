@@ -1,20 +1,14 @@
 use crate::{
-    bundle::{BundleHash, SendBundleRequest, SimulateBundleRequest, StateBlockNumber}, 
+    bundle::{SendBundleRequest, SimulateBundleRequest, StateBlockNumber},
     relay::{Relay, RelayError},
 };
-use async_trait::async_trait;
 use ethers::{
-    core::{
-        types::{BlockNumber, Bytes, U64},
-        utils::keccak256,
-    },
-    providers::{Middleware, MiddlewareError, PendingTransaction},
+    core::types::U64,
+    providers::{Middleware, MiddlewareError},
     signers::Signer,
 };
-use futures_util::future;
 use serde::{de, Deserialize, Deserializer, Serialize};
 use thiserror::Error;
-use url::Url;
 
 #[derive(Debug, Error)]
 pub enum TxBoostMiddlewareError<M: Middleware> {
@@ -49,23 +43,27 @@ pub struct TxBoostMiddleware<M, S> {
     simulation_relay: Option<Relay<S>>,
 }
 
-impl <M: Middleware, S: Signer> TxBoostMiddleware<M, S> {
+impl<M: Middleware, S: Signer> TxBoostMiddleware<M, S> {
     pub fn new(inner: M, relay: Relay<S>, simulation_relay: Option<Relay<S>>) -> Self {
-        Self { inner, relay, simulation_relay }
+        Self {
+            inner,
+            relay,
+            simulation_relay,
+        }
     }
-    
+
     pub fn relay(&self) -> &Relay<S> {
         &self.relay
     }
-    
+
     pub fn simulation_relay(&self) -> Option<&Relay<S>> {
         self.simulation_relay.as_ref()
     }
-    
+
     pub fn into_inner(self) -> M {
         self.inner
     }
-    
+
     pub async fn simulate_bundle(
         &self,
         bundle: &SimulateBundleRequest,
@@ -78,7 +76,7 @@ impl <M: Middleware, S: Signer> TxBoostMiddleware<M, S> {
             .map_err(TxBoostMiddlewareError::RelayError)?
             .ok_or(TxBoostMiddlewareError::BundleSimError)
     }
-    
+
     pub async fn send_bundle(
         &self,
         bundle: &SendBundleRequest,
@@ -92,10 +90,11 @@ impl <M: Middleware, S: Signer> TxBoostMiddleware<M, S> {
 }
 
 fn de_from_str<'de, D>(deserializer: D) -> Result<U64, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    
+
     U64::from_str_radix(&s, 16).map_err(de::Error::custom)
 }
 
@@ -118,11 +117,11 @@ pub struct SendBundleResponse {
     pub gas_fees: String,
     pub results: Vec<SendBundleResult>,
     pub state_block_number: u64,
-    pub total_gas_used: u64, 
+    pub total_gas_used: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct SendBundleResult {
+pub struct SendBundleResult {
     pub bundle_hash: String,
     pub coinbase_diff: String,
     pub eth_sent_to_coinbase: String,
