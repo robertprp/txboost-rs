@@ -3774,7 +3774,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tx-boost"
+name = "txboost-rs"
 version = "0.1.0"
 dependencies = [
  "chrono",

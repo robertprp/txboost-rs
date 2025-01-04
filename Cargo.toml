@@ -2,6 +2,9 @@
 name = "txboost-rs"
 version = "0.1.0"
 edition = "2021"
+authors = ["rbus <me@rbus.me>"]
+description = "Txboost middleware for ethers"
+license = "MIT"
 
 [dependencies]
 serde = "1"
