@@ -11,6 +11,8 @@ A Rust-based library for interacting with the [txboost.io](https://txboost.io) r
 The BNB Chain lacks a centralized sequencer, a feature present in some other blockchains to enforce fair ordering of transactions. 
 Without a centralized sequencer, BNB Chain is susceptible to MEV sandwiches.
 
+The diff between BNB and other roll-ups like optimism or base is that they relay on a single master centralized sequencer, disallowing the access to mempool and thus, pending transactions.
+
 Using txboost.io on the BNB provides the following advantages:
 - **Decentralized Protection**: Mitigates MEV risks without relying on centralized intermediaries.
 - **Fair Transaction Ordering**: Simulate your transactions and leverage transaction atomicity. You get all or you get nothing.
