@@ -4,7 +4,7 @@ A Rust-based library for interacting with the [txboost.io](https://txboost.io) r
 
 ## What is txboost.io?
 
-[txboost.io](https://txboost.io) is a transaction relay service designed to optimize and enhance transaction execution on blockchain networks. It provides a decentralized infrastructure to reduce MEV risks and introduces transaction ordering.
+[txboost.io](https://txboost.io) is a transaction relay service designed to optimize and enhance transaction execution on Mainnet (free) or BNB. It provides infrastructure to reduce MEV risks and introduces transaction ordering.
 
 ## Why Use txboost.io on the BNB Chain?
 
